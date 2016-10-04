@@ -10,20 +10,20 @@ variable "version" {
 }
 
 variable "environment" {
-  type        = "list"
-  value       = []
+  value = ""
+  description = "Environment variables to use available" 
   description = "Environment variables to inject into the Lambda function."
 }
 
 resource "null_resource" "runner" {
   triggers {
-    filepath = "${path.cwd}/tmp/${md5("${var.package}${var.version}${jsonencode(sort(var.environment))}")}.zip"
+    filepath = "${path.cwd}/tmp/${md5("${var.package}${var.version}${var.environment}")}.zip"
   }
 
   provisioner "local-exec" {
     command = <<COMMAND
 mkdir -p ${path.cwd}/tmp
-${path.module}/bin/package ${join(" ", formatlist("-e \"%s\"", var.environment))} -o ${null_resource.runner.triggers.filepath} ${var.package}@${var.version}
+${path.module}/bin/package ${join(" ", formatlist("-e \"%s\"", compact(split("\n", var.environment))))} -o ${null_resource.runner.triggers.filepath} ${var.package}@${var.version}
 COMMAND
   }
 }
