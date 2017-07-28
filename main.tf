@@ -3,18 +3,16 @@ variable "package" {
   description = "The NPM package to be bundled for use as a Lambda function."
 }
 
+
 variable "version" {
-  type        = "string"
-  default     = "*"
-  description = "The package version."
+  default = "*"
+  description = "The version of the package"
 }
 
 variable "environment" {
-  value = ""
-  description = "Environment variables to use available" 
-  description = "Environment variables to inject into the Lambda function."
+  default = ""
+  description = "Environment variables to use available"
 }
-
 resource "null_resource" "runner" {
   triggers {
     filepath = "${path.cwd}/tmp/${md5("${var.package}${var.version}${var.environment}")}.zip"
